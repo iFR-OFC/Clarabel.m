@@ -22,4 +22,4 @@ settings = DefaultSettings();
 settings.equilibrate_enable = true;
 settings.max_iter = 50;
 
-solution = clarabel_mex(P,q,A,b,cones,settings)
+solution = clarabel_mex(P, q, A, b, cones, settings)

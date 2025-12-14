@@ -29,4 +29,4 @@ cones = [
 settings = DefaultSettings();
 
 
-sol = clarabel_mex(P,q,A,b,cones,settings)
+sol = clarabel(P,q,A,b,cones,settings)

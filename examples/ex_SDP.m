@@ -29,4 +29,4 @@ settings.max_iter = 200;
 
 cones = [PSDTriangleConeT(n); zeroConeT(1)];
 
-solution = clarabel_mex(P,q,A,b,cones,settings);
+solution = clarabel_mex(P,q,A,b,cones,settings)

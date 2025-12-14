@@ -41,7 +41,7 @@ cones = [zeroConeT(1);
 % generate settings
 settings = DefaultSettings();
 
-settings.verbose = false;
+settings.verbose = true;
 settings.time_limit = 5.;
 
 % call interface
