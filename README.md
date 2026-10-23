@@ -20,7 +20,7 @@ The following instructions are for Windows and Linux. On Windows we used an MS V
 git clone https://github.com/iFR-ACSO/Clarabel.m.git 
 ```
 
-5. Clone [Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main) it into the main folder of Clarabel.m; name it Clarabel (both needed because the relative paths are set in make_clarabel.m)
+5. Clone [Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main) it into the main folder of Clarabel.m; name it Clarabel (both needed because the relative paths are set in make_clarabel_mex.m)
 ```
 git clone git@github.com:oxfordcontrol/Clarabel.cpp.git Clarabel
 ```
@@ -54,12 +54,12 @@ git submodule update --init --recursive
 
 11.  Open Matlab and run
 ```
-make_clarabel.m
+make_clarabel_mex.m
 ```
 > **Note**: 
-> To successfully run `make_clarabel.m`, you need to set the path to the Eigen library in the script if the path is not set in the environment variables. The variable to update is called `eigenPath`. Make sure it points to the correct location of your Eigen installation on your system.
+> To successfully run `make_clarabel_mex.m`, you need to set the path to the Eigen library in the `EIGEN_PATH` environment variable if it is not found automatically (on macOS with Homebrew, `/opt/homebrew/include/eigen3` is used as the default). The MEX can be built with or without the SDP and faer features by calling `make_clarabel_mex(useFeatureSDP)`. Make sure the feature selection matches the features the Clarabel Rust library was compiled with.
 
-This command copies the needed .dll (or .so on Linux) from the release folder (Clarabel/Rust-Wrapper/Release) to the current folder and sets up the path to eigen library, and to the other needed libraries (from clarabel) and compiles the mex filde. After compilation, the path to Clarabel.m is added permanently to your Matlab path. This includes clarabel_mex, DefaultSetting.m, the folder DefaultCones with the specific cone functions and the example folder, i.e., the re-implemented examples in Matlab from the C++ example package.
+This command compiles the mex file `clarabel_mex`. After compilation, the path to Clarabel.m is added permanently to your Matlab path. This includes clarabel_mex, DefaultSettings.m, the folder DefaultCones with the specific cone functions and the example folder, i.e., the re-implemented examples in Matlab from the C++ example package.
 
 
 # Usage Example

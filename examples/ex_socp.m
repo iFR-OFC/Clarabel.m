@@ -18,7 +18,7 @@ b = [ 1., -2., -2. ]';
 % generate settings
 settings = DefaultSettings();
 settings.max_iter = 200;
-
+settings.verbose =1
 cones = SecondOrderConeT(3);
 
 solution = clarabel_mex(P,q,A,b,cones,settings)

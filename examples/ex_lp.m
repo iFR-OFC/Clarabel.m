@@ -21,5 +21,6 @@ cones = NonnegativeConeT(4);
 settings = DefaultSettings();
 settings.equilibrate_enable = true;
 settings.max_iter = 50;
+settings.verbose = 1;
 
 solution = clarabel_mex(P, q, A, b, cones, settings)
