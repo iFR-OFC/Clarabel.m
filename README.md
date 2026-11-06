@@ -75,18 +75,18 @@ For GNU we used GNU 8.1.0 for both C/C++.
 ```
 git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
 ```
-5. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
+6. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
    ```
    cd Clarabel
    ```
-8. Adapt the Clarabel/CMakeLists.txt with the features you want. To solve SDPs on Windows, select MKL (seems to be the only working solution on Windows)
+7. Adapt the Clarabel/CMakeLists.txt with the features you want. To solve SDPs on Windows, select MKL (seems to be the only working solution on Windows)
    ```
    ...
    set(CLARABEL_FEATURE_SDP "sdp-mkl" CACHE STRING "Package for SDP to be selected")
    ...
    ```
-9. In the **Clarabel** folder, open a terminal (Linux) or **Windows PowerShell** (Windows).
-10.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg (on Windows) (change **PathToVcpk** to your installation directory from Step 2)
+8. In the **Clarabel** folder, open a terminal (Linux) or **Windows PowerShell** (Windows).
+9.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg (on Windows) (change **PathToVcpk** to your installation directory from Step 2)
 
    On Windows, two compiler options. We recommend the MSVC option (see warning below GNU).
    > **Note:** run `mex -setup C/C++` in MATLAB and select the same compiler (MinGW-w64 GCC or MSVC), so the MEX file and the Clarabel library are built with the same compiler. 
@@ -118,8 +118,8 @@ git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
    cmake --build .
    ```
 
-11. Ensure  ```mex -setup``` uses the same C/C++ compiler as used for compiling the C/C++ wrapper. 
-12.  Open Matlab and run
+10. Ensure  ```mex -setup``` uses the same C/C++ compiler as used for compiling the C/C++ wrapper. 
+11.  Open Matlab and run
 ```
 make_clarabel_mex.m
 ```
