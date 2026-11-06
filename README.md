@@ -22,7 +22,7 @@ git clone https://github.com/iFR-ACSO/Clarabel.m.git
 
 5. Clone [Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main) it into the main folder of Clarabel.m; name it Clarabel (both needed because the relative paths are set in make_clarabel_mex.m)
 ```
-git clone git@github.com:oxfordcontrol/Clarabel.cpp.git Clarabel
+git clone https://github.com/oxfordcontrol/Clarabel.cpp.git Clarabel
 ```
 6. Go to the Clarabel folder
 7. Get the submodule (Rust implementation of the actual solver)
