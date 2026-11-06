@@ -16,6 +16,7 @@ Clarabel.m               # Main Folder
  ├── windows             # .mex and .so pre-compiled for Windows
  ├── Linux               # .mex and .so pre-compiled for Linux
 DefaultSettings.m        # Matlab function containing the default settings for Clarabel
+clarabel_install.m       # Simple installation script, in case user want to use the pre-compiled .mex files
 clarabel_mex.cpp         # C++ code for the actual interface to the Clarabel C/C++ interface
 max_clarabel_mex.m       # Script to compile the .mex interface
 ```
