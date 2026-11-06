@@ -13,7 +13,10 @@ function make_clarabel_mex(useFeatureSDP)
 %       library built in Clarabel/rust_wrapper/target/release (see README).
 %     * Eigen 3.4+. The path is taken from the EIGEN_PATH environment
 %       variable, falling back to /opt/homebrew/include/eigen3
-%       (macOS with Homebrew).
+%       (macOS with Homebrew). On Windows, if EIGEN_PATH is unset the
+%       vcpkg default C:\vcpkg\installed\x64-windows\include\eigen3
+%       is used, and a path pointing at the Eigen folder itself
+%       (...\eigen3\Eigen) is replaced by its parent.
 %
 %   NOTES
 %     * useFeatureSDP must match the features the Rust library was built
@@ -35,6 +38,16 @@ function make_clarabel_mex(useFeatureSDP)
     if isempty(eigenPath) && ismac
         eigenPath = "/opt/homebrew/include/eigen3";
     end
+    if ispc
+        if isempty(eigenPath)
+            % Default vcpkg install location on Windows.
+            eigenPath = "C:\vcpkg\installed\x64-windows\include\eigen3";
+        elseif exist(fullfile(eigenPath, "Core"), "file") == 2
+            % EIGEN_PATH points at the Eigen folder itself
+            % (e.g. ...\include\eigen3\Eigen); -I needs its parent.
+            eigenPath = fileparts(eigenPath);
+        end
+    end
     if isempty(eigenPath) || exist(eigenPath, "dir") ~= 7
         error("Eigen not found. Set the EIGEN_PATH environment variable.");
     end
@@ -46,6 +59,7 @@ function make_clarabel_mex(useFeatureSDP)
                fullfile(projectRoot, "Clarabel")]);
     end
 
+    % get the libraries depending on OS
     if ispc
         libFile = "clarabel_c.dll";
     elseif ismac
@@ -53,6 +67,7 @@ function make_clarabel_mex(useFeatureSDP)
     else
         libFile = "libclarabel_c.so";
     end
+
     if ~isfile(fullfile(releasePath, libFile))
         error("Clarabel library not found: %s", fullfile(releasePath, libFile));
     end
@@ -83,6 +98,7 @@ function make_clarabel_mex(useFeatureSDP)
     fprintf('SDP/FAER feature: %d\n', useFeatureSDP);
 
     cleanupLdFlags = [];
+
     if ismac
         % Give the MEX an rpath to the Clarabel library folder. Restore the
         % user's LDFLAGS afterwards.
@@ -90,7 +106,8 @@ function make_clarabel_mex(useFeatureSDP)
         setenv("LDFLAGS", strtrim(sprintf('%s -Wl,-rpath,%s', oldLdFlags, releasePath)));
         cleanupLdFlags = onCleanup(@() setenv("LDFLAGS", oldLdFlags));
     end
-
+    
+    % Compile mex
     mex(args{:});
 
     % --- runtime library placement (Windows/Linux) ------------------------
