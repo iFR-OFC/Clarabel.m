@@ -1,7 +1,10 @@
 # clarabel.m
 
 MATLAB mex interface to [Clarabel](https://clarabel.org/stable/), an interior point solver for convex optimization.
+# Description
 
+This repository contains a (work in progress) MATLAB mex interface to the recently introduced interior point solver [Clarabel](https://clarabel.org/stable/). The mex interface is interfaced to 
+[Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main), the C/C++ interface to the Rust implementation of Clarabel. The interface to the C++ implementation is realized via [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)).
 
 **Folder Structure**
 ```text
@@ -16,11 +19,6 @@ DefaultSettings.m        # Matlab function containing the default settings for C
 clarabel_mex.cpp         # C++ code for the actual interface to the Clarabel C/C++ interface
 max_clarabel_mex.m       # Script to compile the .mex interface
 ```
-
-# Description
-
-This repository contains a (work in progress) MATLAB mex interface to the recently introduced interior point solver [Clarabel](https://clarabel.org/stable/). The mex interface is interfaced to 
-[Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main), the C/C++ interface to the Rust implementation of Clarabel. The interface to the C++ implementation is realized via [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)).
 
 
 # Installation (pre-compiled)
