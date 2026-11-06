@@ -36,4 +36,6 @@ addpath(projectRoot)
 status = savepath;
 if status ~= 0
     warning('Could not save the MATLAB path permanently. Check write permissions for pathdef.m.')
+else
+    fprintf('Clarabel was succesfully installed using the pre-compiled binaries!')
 end
