@@ -29,7 +29,7 @@ git clone https://github.com/oxfordcontrol/Clarabel.cpp.git Clarabel
 ```
 git submodule update --init --recursive
 ```
-8. Adapt the Clarabel/Cmakelist.txt with the features you want. To use SDPs on Windows, select MKL (seems to be the only working solution on Windows)
+8. Adapt the Clarabel/CMakeLists.txt with the features you want. To use SDPs on Windows, select MKL (seems to be the only working solution on Windows)
    ```
    ...
    set(CLARABEL_FEATURE_SDP "sdp-mkl" CACHE STRING "Package for SDP to be selected")
