@@ -71,20 +71,14 @@ which is needed below, i.e., ``` PathToVcpk/vcpkg.cmake``` under step 10
 3. Make sure you have a C/C++ compiler (on Windows either Visual Studio (MSVC) or MinGW-w64 GCC, see step 10; on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
 > **Note:** On Windows we used Visual Studio 18 2026 with Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
 For GNU we used GNU 8.1.0 for both C/C++.
-4. Clone this repository
+4. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule
 ```
-git clone https://github.com/iFR-ACSO/Clarabel.m.git 
+git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
 ```
-
-5. Clone [Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main) it into the main folder of Clarabel.m; name it Clarabel (both needed because the relative paths are set in make_clarabel_mex.m)
-```
-git clone https://github.com/oxfordcontrol/Clarabel.cpp.git Clarabel
-```
-6. Go to the Clarabel folder
-7. Get the submodule (Rust implementation of the actual solver)
-```
-git submodule update --init --recursive
-```
+5. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
+   ```
+   cd Clarabel
+   ```
 8. Adapt the Clarabel/CMakeLists.txt with the features you want. To solve SDPs on Windows, select MKL (seems to be the only working solution on Windows)
    ```
    ...
