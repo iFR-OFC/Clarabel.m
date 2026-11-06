@@ -114,7 +114,7 @@ git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
    ```bash
    mkdir build
    cd build
-   cmake .. -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true
+   cmake .. -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux -DCLARABEL_FEATURE_SDP=sdp-openblas -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true
    cmake --build .
    ```
 
