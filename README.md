@@ -2,6 +2,21 @@
 
 MATLAB mex interface to [Clarabel](https://clarabel.org/stable/), an interior point solver for convex optimization.
 
+
+**Folder Structure**
+```text
+Clarabel.m               # Main Folder
+├── DefaultCones         # Folder containing helper functions for the different cone types (similar to other languages, e.g., Python)		       
+├── examples             # Examples of different problem classes (e.g. LP, QP, SDP)
+├── mex_files            # Folder containing the pre-compiled mex files for differen OS
+ ├── mac_silicon         # .mex and .so pre-compiled for Apple (Silicon)
+ ├── windows             # .mex and .so pre-compiled for Windows
+ ├── Linux               # .mex and .so pre-compiled for Linux
+DefaultSettings.m        # Matlab function containing the default settings for Clarabel
+clarabel_mex.cpp         # C++ code for the actual interface to the Clarabel C/C++ interface
+max_clarabel_mex.m       # Script to compile the .mex interface
+```
+
 # Description
 
 This repository contains a (work in progress) MATLAB mex interface to the recently introduced interior point solver [Clarabel](https://clarabel.org/stable/). The mex interface is interfaced to 
