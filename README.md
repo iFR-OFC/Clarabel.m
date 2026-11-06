@@ -11,20 +11,32 @@ This repository contains a (work in progress) MATLAB mex interface to the recent
 The following instructions are for Windows and Linux. On Windows we used an MS Visual Studio compiler. The .mex interface uses activated SDP feature of clarabel and assume we also use the more efficient [faer-rs](https://github.com/sarah-quinones/faer-rs) library.
 
 1. Install or update [Rust](https://www.rust-lang.org/tools/install) (if necessary)
-2. Install [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)) manually  Add it to your ENVIRONMENT VARIABLES (or later passe the eigen folder in make_clarabel.m) or (recommended) use  [vcpkg](https://vcpkg.io/en/).
-2.1 Install vcpkg
-      Decide a folder on your computer where to clone and use
-         ```
-         git clone https://github.com/microsoft/vcpkg.git
-         cd vcpkg
-         .\bootstrap-vcpkg.bat
-         ```
-2.2 Get eigen with  ```.\vcpkg.exe install eigen3:x64-windows ```
-2.3 For the usage with CMake use ```.\vcpkg integrate install``` which provides you the 
+2. Install [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)). We **recommend**  to use  [vcpkg](https://vcpkg.io/en/) to install the packages. An alterntive is to manually get [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)) and add it to your ENVIRONMENT VARIABLES (or later passe the eigen folder in make_clarabel.m)
 
-> **Note**: 
+ **Install vcpkg on Windows**
+
+Decide a folder on your computer where to clone and use
+```
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+ ```
+Get eigen with  
+```
+.\vcpkg.exe install eigen3:x64-windows
+ ```
+For the usage with CMake use 
+```
+.\vcpkg integrate install
+``` 
+which provides you the path to vcpkg.cmake. In Windows PowerShell this should provide you something like  
+``` CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"```
+which is needed below, i.e., ``` PathToVcpk/vcpkg.cmake``` under step 10
+
+ **Install eigen on Linux** 
 > On Linux, the standard installation procedure using `sudo apt-get install libeigen3-dev` will not work because the version available (v3.3.7) is outdated, version v3.4 is required. To resolve this, you will need to manually install the latest version of eigen directly from the [eigen website](https://eigen.tuxfamily.org/dox/). Follow the instructions there for a successful installation.
-3. Make sure you have a C/C++ compiler (in the following it is assumed that Visual Studio compiler is available; needed to compile the Rust-Wrapper and the actual .mex function)
+3. Make sure you have a C/C++ compiler (in the following it is assumed that Visual Studio compiler is available; needed to compile the Rust-Wrapper and the actual .mex function).
+> **Note:** On Windows we use Visual Studio 18 2026 wit Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
 4. Clone this repository
 ```
 git clone https://github.com/iFR-ACSO/Clarabel.m.git 
@@ -39,14 +51,15 @@ git clone https://github.com/oxfordcontrol/Clarabel.cpp.git Clarabel
 ```
 git submodule update --init --recursive
 ```
-8. Adapt the Clarabel/CMakeLists.txt with the features you want. To use SDPs on Windows, select MKL (seems to be the only working solution on Windows)
+8. Adapt the Clarabel/CMakeLists.txt with the features you want. To solve SDPs on Windows, select MKL (seems to be the only working solution on Windows)
    ```
    ...
    set(CLARABEL_FEATURE_SDP "sdp-mkl" CACHE STRING "Package for SDP to be selected")
    ...
    ```
 9. In the **Clarabel** folder, open a terminal (Linux) or **Windows PowerShell** (Windows).
-10.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg (on Windows) (change **PathToVcpk** to your installation directory)
+10.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg (on Windows) (change **PathToVcpk** to your installation directory from Step 2)
+
    On Windows:
    ```powershell
    mkdir build
@@ -54,6 +67,8 @@ git submodule update --init --recursive
    cmake .. -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true
    cmake --build .
    ```
+   >**Note:** On Windows it might show some uncritical warnings during the compilation. 
+
    On Linux:
    ```bash
    mkdir build
@@ -62,14 +77,16 @@ git submodule update --init --recursive
    cmake --build .
    ```
 
-11.  Open Matlab and run
+11. Ensure  ```mex -setup``` uses the same C/C++ compiler as used for compiling the C/C++ wrapper. 
+12.  Open Matlab and run
 ```
 make_clarabel_mex.m
 ```
 > **Note**: 
 > To successfully run `make_clarabel_mex.m`, you need to set the path to the Eigen library in the `EIGEN_PATH` environment variable if it is not found automatically (on macOS with Homebrew, `/opt/homebrew/include/eigen3` is used as the default). The MEX can be built with or without the SDP and faer features by calling `make_clarabel_mex(useFeatureSDP)`. Make sure the feature selection matches the features the Clarabel Rust library was compiled with.
 
-This command compiles the mex file `clarabel_mex`. After compilation, the path to Clarabel.m is added permanently to your Matlab path. This includes clarabel_mex, DefaultSettings.m, the folder DefaultCones with the specific cone functions and the example folder, i.e., the re-implemented examples in Matlab from the C++ example package.
+
+This command compiles the mex file `clarabel_mex`. 
 
 
 # Usage Example
