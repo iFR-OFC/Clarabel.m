@@ -27,12 +27,9 @@ settings = DefaultSettings();
 settings.max_iter = 100;
 settings.verbose = 1;
 settings.direct_solve_method =  'FAER';
-% settings.chordal_decomposition_compact = 'NONE';
 
 cones = [PSDTriangleConeT(n); zeroConeT(1)];
 
-try 
 solution = clarabel_mex(P,q,A,b,cones,settings);
-catch
-end
+
 
