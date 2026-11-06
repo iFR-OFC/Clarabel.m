@@ -11,7 +11,17 @@ This repository contains a (work in progress) MATLAB mex interface to the recent
 The following instructions are for Windows and Linux. On Windows we used an MS Visual Studio compiler. The .mex interface uses activated SDP feature of clarabel and assume we also use the more efficient [faer-rs](https://github.com/sarah-quinones/faer-rs) library.
 
 1. Install or update [Rust](https://www.rust-lang.org/tools/install) (if necessary)
-2. Install [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)). Add it to your ENVIRONMENT VARIABLES (or later passe the eigen folder in make_clarabel.m) 
+2. Install [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)) manually  Add it to your ENVIRONMENT VARIABLES (or later passe the eigen folder in make_clarabel.m) or (recommended) use  [vcpkg](https://vcpkg.io/en/).
+2.1 Install vcpkg
+      Decide a folder on your computer where to clone and use
+         ```
+         git clone https://github.com/microsoft/vcpkg.git
+         cd vcpkg
+         .\bootstrap-vcpkg.bat
+         ```
+2.2 Get eigen with  ```.\vcpkg.exe install eigen3:x64-windows ```
+2.3 For the usage with CMake use ```.\vcpkg integrate install``` which provides you the 
+
 > **Note**: 
 > On Linux, the standard installation procedure using `sudo apt-get install libeigen3-dev` will not work because the version available (v3.3.7) is outdated, version v3.4 is required. To resolve this, you will need to manually install the latest version of eigen directly from the [eigen website](https://eigen.tuxfamily.org/dox/). Follow the instructions there for a successful installation.
 3. Make sure you have a C/C++ compiler (in the following it is assumed that Visual Studio compiler is available; needed to compile the Rust-Wrapper and the actual .mex function)
