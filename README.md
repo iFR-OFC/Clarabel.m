@@ -1,13 +1,42 @@
 # clarabel.m
 
 MATLAB mex interface to [Clarabel](https://clarabel.org/stable/), an interior point solver for convex optimization.
-
 # Description
 
 This repository contains a (work in progress) MATLAB mex interface to the recently introduced interior point solver [Clarabel](https://clarabel.org/stable/). The mex interface is interfaced to 
 [Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main), the C/C++ interface to the Rust implementation of Clarabel. The interface to the C++ implementation is realized via [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)).
 
-# Installation
+**Folder Structure**
+```text
+Clarabel.m               # Main Folder
+├── DefaultCones         # Folder containing helper functions for the different cone types (similar to other languages, e.g., Python)		       
+├── examples             # Examples of different problem classes (e.g. LP, QP, SDP)
+├── mex_files            # Folder containing the pre-compiled mex files for differen OS
+ ├── mac_silicon         # .mex and .so pre-compiled for Apple (Silicon)
+ ├── windows             # .mex and .so pre-compiled for Windows
+ ├── Linux               # .mex and .so pre-compiled for Linux
+DefaultSettings.m        # Matlab function containing the default settings for Clarabel
+clarabel_install.m       # Simple installation script, in case user want to use the pre-compiled .mex files
+clarabel_mex.cpp         # C++ code for the actual interface to the Clarabel C/C++ interface
+max_clarabel_mex.m       # Script to compile the .mex interface
+```
+
+
+# Installation (pre-compiled)
+We provide pre-compiled ```.mex``` files with the corresponding library/.dll. Simply download the ```.zip``` of this repository. Unzip and place folder at a desired location on your computer. In the main folder execute 
+```
+clarabel_install.m
+```
+which simply checks your operating system and adds the folder with the coresponding .mex file and libraries and the folder needed to run Clarabel in MATLAB permanently to your MATLAB path.
+
+>**Note:** We provide the pre-compiled .mex + libraries for the instructions below. If you want to use different compile options, you have to adapt it manually.
+
+The following options are set in the .mex files:
+- ```CLARABEL_FEATURE_SDP``` is activated, so you can also use Clarabel to compute SDP problems
+- ```FAER``` is activated as alternative linear system solver
+
+
+# Installation (compiled by yourself)
 The following instructions are for Windows and Linux. On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .mex interface uses activated SDP feature of clarabel and assume we also use the more efficient [faer-rs](https://github.com/sarah-quinones/faer-rs) library.
 
 1. Install or update [Rust](https://www.rust-lang.org/tools/install) (if necessary)
@@ -21,7 +50,7 @@ git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
 .\bootstrap-vcpkg.bat
  ```
-Get eigen with (the triplet must match the compiler used in step 10; GNU option first)  
+Get eigen with for GNU 
 ```
 .\vcpkg.exe install eigen3:x64-mingw-dynamic
  ```
