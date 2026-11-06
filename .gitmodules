@@ -1,0 +1,3 @@
+[submodule "Clarabel"]
+	path = Clarabel
+	url = https://github.com/oxfordcontrol/Clarabel.cpp.git
