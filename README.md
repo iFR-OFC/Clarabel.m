@@ -8,7 +8,7 @@ This repository contains a (work in progress) MATLAB mex interface to the recent
 [Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main), the C/C++ interface to the Rust implementation of Clarabel. The interface to the C++ implementation is realized via [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)).
 
 # Installation
-The following instructions are for Windows and Linux. On Windows we used an MS Visual Studio compiler. The .mex interface uses activated SDP feature of clarabel and assume we also use the more efficient [faer-rs](https://github.com/sarah-quinones/faer-rs) library.
+The following instructions are for Windows and Linux. On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .mex interface uses activated SDP feature of clarabel and assume we also use the more efficient [faer-rs](https://github.com/sarah-quinones/faer-rs) library.
 
 1. Install or update [Rust](https://www.rust-lang.org/tools/install) (if necessary)
 2. Install [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)). We **recommend**  to use  [vcpkg](https://vcpkg.io/en/) to install the packages. An alterntive is to manually get [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)) and add it to your ENVIRONMENT VARIABLES (or later passe the eigen folder in make_clarabel.m)
@@ -21,7 +21,11 @@ git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
 .\bootstrap-vcpkg.bat
  ```
-Get eigen with  
+Get eigen with (the triplet must match the compiler used in step 10; GNU option first)  
+```
+.\vcpkg.exe install eigen3:x64-mingw-dynamic
+ ```
+or, with MSVC (Visual Studio):  
 ```
 .\vcpkg.exe install eigen3:x64-windows
  ```
@@ -35,8 +39,9 @@ which is needed below, i.e., ``` PathToVcpk/vcpkg.cmake``` under step 10
 
  **Install eigen on Linux** 
 > On Linux, the standard installation procedure using `sudo apt-get install libeigen3-dev` will not work because the version available (v3.3.7) is outdated, version v3.4 is required. To resolve this, you will need to manually install the latest version of eigen directly from the [eigen website](https://eigen.tuxfamily.org/dox/). Follow the instructions there for a successful installation.
-3. Make sure you have a C/C++ compiler (in the following it is assumed that Visual Studio compiler is available; needed to compile the Rust-Wrapper and the actual .mex function).
-> **Note:** On Windows we use Visual Studio 18 2026 wit Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
+3. Make sure you have a C/C++ compiler (on Windows either Visual Studio (MSVC) or MinGW-w64 GCC, see step 10; on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
+> **Note:** On Windows we used Visual Studio 18 2026 with Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
+For GNU we used GNU 8.1.0 for both C/C++.
 4. Clone this repository
 ```
 git clone https://github.com/iFR-ACSO/Clarabel.m.git 
@@ -60,13 +65,26 @@ git submodule update --init --recursive
 9. In the **Clarabel** folder, open a terminal (Linux) or **Windows PowerShell** (Windows).
 10.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg (on Windows) (change **PathToVcpk** to your installation directory from Step 2)
 
-   On Windows:
+   On Windows, two compiler options. We recommend the MSVC option (see warning below GNU).
+   > **Note:** run `mex -setup C/C++` in MATLAB and select the same compiler (MinGW-w64 GCC or MSVC), so the MEX file and the Clarabel library are built with the same compiler. 
+  
+   **MSVC (Visual Studio):**
    ```powershell
    mkdir build
    cd build
    cmake .. -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true
+   cmake --build . --config Release
+   ```
+   >**Note:** On Windows it might show some uncritical warnings during the compilation. 
+   
+   **GNU compiler (MinGW-w64;** make sure `gcc`, `g++` and `mingw32-make` are on your PATH**):**
+   ```powershell
+   mkdir build
+   cd build
+   cmake .. -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true
    cmake --build .
    ```
+   >**Warning:** If compiled with MinGW, the verbosity option does not work, i.e., the Clarabel iterations are not printed to the Command Window. 
    >**Note:** On Windows it might show some uncritical warnings during the compilation. 
 
    On Linux:
