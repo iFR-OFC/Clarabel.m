@@ -81,7 +81,7 @@ On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .
    For GNU we used GNU 8.1.0 for both C/C++.
 4. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule
    ```
-   git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
+   git clone --recurse-submodules https://github.com/iFR-OFC/Clarabel.m.git
    ```
 6. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
    ```
@@ -132,7 +132,7 @@ On Mac, we make use of ```homebrew```.
 4. Ensure Apple Clang compiler is available (should be if Xcode is installed)
 5. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule
    ```
-   git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
+   git clone --recurse-submodules https://github.com/iFR-OFC/Clarabel.m.git
    ```
 6.   Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
       ```
@@ -164,7 +164,7 @@ On Mac, we make use of ```homebrew```.
 3. Make sure you have a C/C++ compiler (on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
 4. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule.
    ```
-   git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
+   git clone --recurse-submodules https://github.com/iFR-OFC/Clarabel.m.git
    ```
 5. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
    ```
