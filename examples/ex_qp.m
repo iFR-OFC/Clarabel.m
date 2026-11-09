@@ -24,5 +24,5 @@ cones = [ zeroConeT(1);
 % generate settings
 settings = DefaultSettings();
 settings.max_iter = 200;
-
+settings.verbose =1;
 solution = clarabel_mex(P,q,A,b,cones,settings)

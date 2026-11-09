@@ -103,7 +103,7 @@ function make_clarabel_mex(useFeatureSDP)
     if status ~= 0
         warning('Could not save the MATLAB path permanently. Check write permissions for pathdef.m.')
     else
-         fprintf('Clarabel Paths are set permanently');
+         fprintf('Clarabel Paths are set permanently\n');
     end
 
 end
