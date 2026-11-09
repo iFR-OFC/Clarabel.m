@@ -176,7 +176,7 @@ On Mac, we make use of ```homebrew```.
    set(CLARABEL_FEATURE_SDP "sdp-openblas" CACHE STRING "Package for SDP to be selected")
    ...
    ```
-7. In the **Clarabel** folder, open a terminal (Linux).
+7. In the **Clarabel** folder, open a terminal.
 8.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg
       ```
       mkdir build
