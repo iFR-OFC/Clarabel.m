@@ -81,7 +81,7 @@ On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .
    For GNU we used GNU 8.1.0 for both C/C++.
 4. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule
    ```
-   git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
+   git clone --recurse-submodules https://github.com/iFR-OFC/Clarabel.m.git
    ```
 6. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
    ```
@@ -132,7 +132,7 @@ On Mac, we make use of ```homebrew```.
 4. Ensure Apple Clang compiler is available (should be if Xcode is installed)
 5. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule
    ```
-   git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
+   git clone --recurse-submodules https://github.com/iFR-OFC/Clarabel.m.git
    ```
 6.   Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
       ```
@@ -157,50 +157,44 @@ On Mac, we make use of ```homebrew```.
 
 
 ## Linux
-**UNDER CONSTRUCTIONS** 
 
-**Install eigen on Linux** 
-> On Linux, the standard installation procedure using `sudo apt-get install libeigen3-dev` will not work because the version available (v3.3.7) is outdated, version v3.4 is required. To resolve this, you will need to manually install the latest version of eigen directly from the [eigen website](https://eigen.tuxfamily.org/dox/). Follow the instructions there for a successful installation.
-3. Make sure you have a C/C++ compiler (on Windows either Visual Studio (MSVC) or MinGW-w64 GCC, see step 10; on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
-> **Note:** On Windows we used Visual Studio 18 2026 with Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
-For GNU we used GNU 8.1.0 for both C/C++.
-4. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule
-```
-git clone --recurse-submodules https://github.com/iFR-ACSO/Clarabel.m.git
-```
-6. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
+1. Install eigen.
+   > On Linux, the standard installation procedure using `sudo apt-get install libeigen3-dev` will not work because the version available (v3.3.7) is outdated, version v3.4 is required. To resolve this, you will need to manually install the latest version of eigen directly from the [eigen website](https://eigen.tuxfamily.org/dox/). Follow the instructions there for a successful installation.
+2. Get `cmake` and `rust`.
+3. Make sure you have a C/C++ compiler (on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
+4. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule.
+   ```
+   git clone --recurse-submodules https://github.com/iFR-OFC/Clarabel.m.git
+   ```
+5. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
    ```
    cd Clarabel
    ```
-7. Adapt the Clarabel/CMakeLists.txt with the features you want. To solve SDPs on Windows, select MKL (seems to be the only working solution on Windows)
+6. Adapt the Clarabel/CMakeLists.txt with the features you want. To solve SDPs on Linux, select OpenBlas
    ```
    ...
-   set(CLARABEL_FEATURE_SDP "sdp-mkl" CACHE STRING "Package for SDP to be selected")
+   set(CLARABEL_FEATURE_SDP "sdp-openblas" CACHE STRING "Package for SDP to be selected")
    ...
    ```
-8. In the **Clarabel** folder, open a terminal (Linux) or **Windows PowerShell** (Windows).
-9.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg (on Windows) (change **PathToVcpk** to your installation directory from Step 2)
+7. In the **Clarabel** folder, open a terminal.
+8.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg
+      ```
+      mkdir build
+      cd build
+      cmake .. -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux -DCLARABEL_FEATURE_SDP=sdp-openblas -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true
+      cmake --build .
+      ```
 
-   > **Note:** run `mex -setup C/C++` in MATLAB and select the same compiler (MinGW-w64 GCC or MSVC), so the MEX file and the Clarabel library are built with the same compiler. 
-  
-   On Linux:
-   ```bash
-   mkdir build
-   cd build
-   cmake .. -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true
-   cmake --build .
-   ```
+      > **Note:** run `mex -setup C/C++` in MATLAB and select the same compiler, so the MEX file and the Clarabel library are built with the same compiler. 
 
-10. Ensure  ```mex -setup``` uses the same C/C++ compiler as used for compiling the C/C++ wrapper. 
-11.  Open Matlab and run
-```
-make_clarabel_mex.m
-```
-> **Note**: 
-> To successfully run `make_clarabel_mex.m`, you need to set the path to the Eigen library in the `EIGEN_PATH` environment variable if it is not found automatically (on macOS with Homebrew, `/opt/homebrew/include/eigen3` is used as the default). The MEX can be built with or without the SDP and faer features by calling `make_clarabel_mex(useFeatureSDP)`. Make sure the feature selection matches the features the Clarabel Rust library was compiled with.
+9.  Ensure  ```mex -setup``` uses the same C/C++ compiler as used for compiling the C/C++ wrapper. 
+10.   Open Matlab and run
+      ```
+      make_clarabel_mex.m
+      ```
+      > **Note**: 
+      > To successfully run `make_clarabel_mex.m`, you need to set the path to the Eigen library in the `EIGEN_PATH` environment variable if it is not found automatically. The MEX can be built with or without the SDP and faer features by calling `make_clarabel_mex(useFeatureSDP)`. Make sure the feature selection matches the features the Clarabel Rust library was compiled with.
 
-
-This command compiles the mex file `clarabel_mex`. 
 
 # Usage
 
