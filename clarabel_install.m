@@ -44,7 +44,7 @@ end
 fprintf('Downloading binaries...');
 zipFile = sprintf('%s.zip', platform);
 zipPath = fullfile(platformDir, zipFile);
-websave(zipPath, sprintf('https://github.com/iFR-OFC/Clarabel.m/releases/latest/download/%s.zip', platform))
+websave(zipPath, sprintf('https://github.com/iFR-OFC/Clarabel.m/releases/latest/download/%s.zip', platform));
 
 % delete zip
 unzip(zipPath, mexDir)
