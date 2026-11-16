@@ -28,20 +28,17 @@ max_clarabel_mex.m       # Script to compile the .mex interface
 
 
 # Installation without Building Binaries
-We provide pre-compiled ```.mex``` files with the corresponding library/.dll. Simply download the ```.zip``` of this repository. Unzip and place folder at a desired location on your computer. In the main folder execute 
+We provide pre-compiled ```.mex``` files with the corresponding library/.dll (see latest release). Download the ```.zip``` of this repository. Unzip and place folder at a desired location on your computer. In the main folder execute 
 ```
 clarabel_install.m
 ```
-which simply checks your operating system and adds the folder with the corresponding .mex file and libraries and the folder needed to run Clarabel in MATLAB permanently to your MATLAB path.
+which checks your operating system, downloads the corresponding binaries and adds all necessary folders with the corresponding .mex file and libraries permanently (if permission granted) to your MATLAB path.
 
 >**Note:** We provide the pre-compiled .mex + libraries for the instructions below. If you want to use different compile options, you have to adapt it manually and compile again.
 
 The following options are set in the .mex files:
 - ```CLARABEL_FEATURE_SDP``` is activated, so you can also use Clarabel to compute SDP problems
 - ```FAER``` is activated as alternative linear system solver
-
->**Note:** We plan to publish a release of this repository soon. The installation from binaries will therefore change in the future!
-
 
 # Build Binaries
 The following instructions are for Windows, Mac (Silicon) and Linux. 
