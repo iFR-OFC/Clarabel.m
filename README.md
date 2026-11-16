@@ -73,7 +73,7 @@ On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .
       ``` 
       which provides you the path to vcpkg.cmake. In Windows PowerShell this should provide you something like  
       ``` CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"```
-      which is needed below, i.e., ``` PathToVcpk/vcpkg.cmake``` under step 10
+      which is needed below, i.e., ``` PathToVcpk/vcpkg.cmake``` under step 6.
 
 3. Make sure you have a C/C++ compiler (on Windows either Visual Studio (MSVC) or MinGW-w64 GCC, see step 10; on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
    > **Note:** On Windows we used Visual Studio 18 2026 with Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
