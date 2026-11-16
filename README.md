@@ -16,10 +16,6 @@ This repository contains an unofficial MATLAB ```mex``` interface to the recentl
 Clarabel.m               # Main Folder
 ├── DefaultCones         # Folder containing helper functions for the different cone types (similar to other languages, e.g., Python)		       
 ├── examples             # Examples of different problem classes (e.g. LP, QP, SDP)
-├── mex_files            # Folder containing the pre-compiled mex files for differen OS
- ├── mac_silicon         # .mex and .so pre-compiled for Apple (Silicon)
- ├── windows             # .mex and .so pre-compiled for Windows
- ├── linux               # .mex and .so pre-compiled for Linux
 DefaultSettings.m        # Matlab function containing the default settings for Clarabel
 clarabel_install.m       # Simple installation script, in case user want to use the pre-compiled .mex files
 clarabel_mex.cpp         # C++ code for the actual interface to the Clarabel C/C++ interface
@@ -32,8 +28,14 @@ We provide pre-compiled ```.mex``` files with the corresponding library/.dll (se
 ```
 clarabel_install.m
 ```
-which checks your operating system, downloads the corresponding binaries and adds all necessary folders with the corresponding .mex file and libraries permanently (if permission granted) to your MATLAB path.
-
+which checks your operating system (OS), downloads the corresponding binaries and adds all necessary folders with the corresponding .mex file and libraries permanently (if permission granted) to your MATLAB path.
+A new folder with subfolder is added to the main folder ```Clarabel.m``` , according to your OS.
+```text
+├── mex_files            # Folder containing the pre-compiled mex files for differen OS
+ ├── mac_silicon         # .mex and binaries for Apple (Silicon)
+ ├── windows             # .mex and binaries for Windows
+ ├── linux               # .mex and binaries for Linux
+```
 >**Note:** We provide the pre-compiled .mex + libraries for the instructions below. If you want to use different compile options, you have to adapt it manually and compile again.
 
 The following options are set in the .mex files:
