@@ -8,7 +8,7 @@ On this page you find:
 
 # Description
 
-This repository contains an unofficial MATLAB ```mex``` interface to the recently introduced interior point solver [Clarabel](https://clarabel.org/stable/). The ```mex``` interface is interfaced to 
+This repository contains an unofficial MATLAB ```mex``` interface to the recently introduced interior-point solver [Clarabel.rs v0.11.1](https://clarabel.org/stable/). The ```mex``` interface is interfaced to 
 [Clarabel.cpp](https://github.com/oxfordcontrol/Clarabel.cpp/tree/main), the C/C++ interface to the Rust implementation of Clarabel. The interface to the C++ implementation is realized via [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)).
 
 **Folder Structure**
