@@ -21,6 +21,7 @@ A = sparse([-1.,     0.,  0.,     0.,     0.,  0.;
 
 b = [0., 0., 0., 0., 0., 0., 1. ]';
 
+cones = [PSDTriangleConeT(n); zeroConeT(1)];
 
 % generate settings
 settings = DefaultSettings();
@@ -28,8 +29,15 @@ settings.max_iter = 100;
 settings.verbose = 1;
 settings.direct_solve_method =  'FAER';
 
-cones = [PSDTriangleConeT(n); zeroConeT(1)];
+solution = clarabel_mex(P,q,A,b,cones)
 
 solution = clarabel_mex(P,q,A,b,cones,settings);
 
+settings = [];
+settings.max_iter = 10;
+settings.verbose = 1;
+solution = clarabel_mex(P,q,A,b,cones,settings);
 
+settings = struct();
+solution = clarabel_mex(P,q,A,b,cones,[]);
+solution = clarabel_mex(P,q,A,b,cones,settings);

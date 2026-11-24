@@ -8,12 +8,13 @@ function settings = DefaultSettings()
 settings = struct();
 
 % Integer fields
-settings.max_iter                       = uint32(50); 
-settings.equilibrate_max_iter           = uint32(10); 
-settings.iterative_refinement_max_iter  = uint32(10); 
+settings.max_iter                       = uint32(200);
+settings.equilibrate_max_iter           = uint32(10);
+settings.iterative_refinement_max_iter  = uint32(10);
+settings.max_threads                    = uint32(0);
 
 % Boolean fields
-settings.verbose = false; 
+settings.verbose = false;
 settings.equilibrate_enable             = true; 
 settings.direct_kkt_solver              = true; 
 settings.static_regularization_enable   = true; 
@@ -39,7 +40,7 @@ settings.tol_ktratio                        = 1e-6;
 settings.reduced_tol_gap_abs                = 5e-5; 
 settings.reduced_tol_gap_rel                = 5e-5; 
 settings.reduced_tol_feas                   = 1e-4; 
-settings.reduced_tol_infeas_abs             = 5e-5; 
+settings.reduced_tol_infeas_abs             = 5e-12;
 settings.reduced_tol_infeas_rel             = 5e-5; 
 settings.reduced_tol_ktratio                = 1e-4; 
 settings.equilibrate_min_scaling            = 1e-4; 
@@ -56,9 +57,9 @@ settings.iterative_refinement_abstol        = 1e-12;
 settings.iterative_refinement_stop_ratio    = 5.0; 
 
 % Enum fields
-settings.direct_solve_method = 'qdldl'; % alternatives: 'qdldl' or 'FAER'
+settings.direct_solve_method = 'auto'; % alternatives: 'auto', 'qdldl' or 'FAER'
 % #ifdef FEATURE_SDP
-settings.chordal_decomposition_merge_method = 'CLIQUE_GRAPH'; % 'PARENT_CHILD' or 'NONE' or 
+settings.chordal_decomposition_merge_method = 'clique_graph'; % 'parent_child' or 'none' or 
 % #endif
 
 end

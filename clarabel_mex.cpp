@@ -3,7 +3,10 @@
 // MATLAB C++ MEX interface for the Clarabel interior-point solver.
 //
 // Usage:
-//   solution = clarabel_mex(P, q, A, b, cones, settings)
+//   solution = clarabel_mex(P, q, A, b, cones) or
+//   solution = clarabel_mex(P, q, A, b, cones,settings) where settings is either
+//   settings  = DefaultSettings() or you can set single valued fields
+//   Note: DefaultSettings.m is a mirror of the default parameter
 //
 // Inputs:
 //   P        sparse or dense n x n matrix   (quadratic cost: 1/2 x'Px + q'x)
@@ -13,7 +16,7 @@
 //   cones    struct array built by the functions in DefaultCones/
 //            (zeroConeT, NonnegativeConeT, SecondOrderConeT, exponentialConeT,
 //             PowerConeT, GenPowerConeT, PSDTriangleConeT)
-//   settings struct produced by DefaultSettings()
+//   settings optional struct from DefaultSettings.m; absent fields keep C++ defaults
 //
 // Output:
 //   solution struct with fields
@@ -36,6 +39,7 @@
 
 #include "clarabel.hpp"
 
+#include <cctype>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -121,6 +125,14 @@ private:
             result += static_cast<char>(c);
         }
         return result;
+    }
+
+    static std::string toLower(std::string str)
+    {
+        for (char& c : str) {
+            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        }
+        return str;
     }
 
     // ------------------------------------------------------------------
@@ -209,23 +221,39 @@ private:
         return 0.0; // unreachable
     }
 
-    bool readBool(const StructArray& s, const char* field)
+    bool hasField(const StructArray& s, const char* field)
     {
-        return readScalar(s[0][field], field) != 0.0;
-    }
-
-    uint32_t readUint(const StructArray& s, const char* field)
-    {
-        double value = readScalar(s[0][field], field);
-        if (value < 0.0) {
-            raiseError(std::string(field) + " must be non-negative.");
+        for (const auto& name : s.getFieldNames()) {
+            if (static_cast<std::string>(name) == field) {
+                return true;
+            }
         }
-        return static_cast<uint32_t>(value);
+        return false;
     }
 
-    double readDouble(const StructArray& s, const char* field)
+    void setIfPresent(const StructArray& s, const char* field, bool& target)
     {
-        return readScalar(s[0][field], field);
+        if (hasField(s, field)) {
+            target = readScalar(s[0][field], field) != 0.0;
+        }
+    }
+
+    void setIfPresent(const StructArray& s, const char* field, uint32_t& target)
+    {
+        if (hasField(s, field)) {
+            double value = readScalar(s[0][field], field);
+            if (value < 0.0) {
+                raiseError(std::string(field) + " must be non-negative.");
+            }
+            target = static_cast<uint32_t>(value);
+        }
+    }
+
+    void setIfPresent(const StructArray& s, const char* field, double& target)
+    {
+        if (hasField(s, field)) {
+            target = readScalar(s[0][field], field);
+        }
     }
 
     // ------------------------------------------------------------------
@@ -300,95 +328,113 @@ private:
     // Settings parsing
     // ------------------------------------------------------------------
 
+    DefaultSettings<double> mexDefaultSettings()
+    {
+        DefaultSettings<double> settings = DefaultSettings<double>::default_settings();
+        settings.verbose = false;
+        return settings;
+    }
+
     DefaultSettings<double> parseSettings(const Array& input)
     {
+        if (input.getNumberOfElements() == 0) {
+            return mexDefaultSettings();
+        }
+        if (input.getType() != ArrayType::STRUCT) {
+            raiseError("Settings input must be a struct (see DefaultSettings.m), empty, or omitted.");
+        }
         StructArray s = input;
 
-        // Start from the library defaults, then overwrite with the values
-        // supplied in the settings struct (produced by DefaultSettings.m).
-        DefaultSettings<double> settings = DefaultSettings<double>::default_settings();
+        DefaultSettings<double> settings = mexDefaultSettings();
 
         // Basic
-        settings.verbose     = readBool(s, "verbose");
-        settings.max_iter    = readUint(s, "max_iter");
-        settings.time_limit  = readDouble(s, "time_limit");
-        settings.presolve_enable = readBool(s, "presolve_enable");
+        setIfPresent(s, "verbose", settings.verbose);
+        setIfPresent(s, "max_iter", settings.max_iter);
+        setIfPresent(s, "time_limit", settings.time_limit);
+        setIfPresent(s, "max_threads", settings.max_threads);
+        setIfPresent(s, "presolve_enable", settings.presolve_enable);
 
         // Scaling / equilibration
-        settings.equilibrate_enable    = readBool(s, "equilibrate_enable");
-        settings.equilibrate_max_iter  = readUint(s, "equilibrate_max_iter");
-        settings.equilibrate_min_scaling = readDouble(s, "equilibrate_min_scaling");
-        settings.equilibrate_max_scaling = readDouble(s, "equilibrate_max_scaling");
+        setIfPresent(s, "equilibrate_enable", settings.equilibrate_enable);
+        setIfPresent(s, "equilibrate_max_iter", settings.equilibrate_max_iter);
+        setIfPresent(s, "equilibrate_min_scaling", settings.equilibrate_min_scaling);
+        setIfPresent(s, "equilibrate_max_scaling", settings.equilibrate_max_scaling);
 
         // Termination tolerances
-        settings.tol_gap_abs   = readDouble(s, "tol_gap_abs");
-        settings.tol_gap_rel   = readDouble(s, "tol_gap_rel");
-        settings.tol_feas      = readDouble(s, "tol_feas");
-        settings.tol_infeas_abs = readDouble(s, "tol_infeas_abs");
-        settings.tol_infeas_rel = readDouble(s, "tol_infeas_rel");
-        settings.tol_ktratio   = readDouble(s, "tol_ktratio");
-        settings.reduced_tol_gap_abs   = readDouble(s, "reduced_tol_gap_abs");
-        settings.reduced_tol_gap_rel   = readDouble(s, "reduced_tol_gap_rel");
-        settings.reduced_tol_feas     = readDouble(s, "reduced_tol_feas");
-        settings.reduced_tol_infeas_abs = readDouble(s, "reduced_tol_infeas_abs");
-        settings.reduced_tol_infeas_rel = readDouble(s, "reduced_tol_infeas_rel");
-        settings.reduced_tol_ktratio   = readDouble(s, "reduced_tol_ktratio");
+        setIfPresent(s, "tol_gap_abs", settings.tol_gap_abs);
+        setIfPresent(s, "tol_gap_rel", settings.tol_gap_rel);
+        setIfPresent(s, "tol_feas", settings.tol_feas);
+        setIfPresent(s, "tol_infeas_abs", settings.tol_infeas_abs);
+        setIfPresent(s, "tol_infeas_rel", settings.tol_infeas_rel);
+        setIfPresent(s, "tol_ktratio", settings.tol_ktratio);
+        setIfPresent(s, "reduced_tol_gap_abs", settings.reduced_tol_gap_abs);
+        setIfPresent(s, "reduced_tol_gap_rel", settings.reduced_tol_gap_rel);
+        setIfPresent(s, "reduced_tol_feas", settings.reduced_tol_feas);
+        setIfPresent(s, "reduced_tol_infeas_abs", settings.reduced_tol_infeas_abs);
+        setIfPresent(s, "reduced_tol_infeas_rel", settings.reduced_tol_infeas_rel);
+        setIfPresent(s, "reduced_tol_ktratio", settings.reduced_tol_ktratio);
 
         // Step size / linesearch
-        settings.max_step_fraction          = readDouble(s, "max_step_fraction");
-        settings.linesearch_backtrack_step  = readDouble(s, "linesearch_backtrack_step");
-        settings.min_switch_step_length    = readDouble(s, "min_switch_step_length");
-        settings.min_terminate_step_length  = readDouble(s, "min_terminate_step_length");
+        setIfPresent(s, "max_step_fraction", settings.max_step_fraction);
+        setIfPresent(s, "linesearch_backtrack_step", settings.linesearch_backtrack_step);
+        setIfPresent(s, "min_switch_step_length", settings.min_switch_step_length);
+        setIfPresent(s, "min_terminate_step_length", settings.min_terminate_step_length);
 
         // KKT solver
-        settings.direct_kkt_solver = readBool(s, "direct_kkt_solver");
-        std::string solveMethod = getString(s[0]["direct_solve_method"],
-                                            "direct_solve_method");
-        if (solveMethod == "qdldl") {
-            settings.direct_solve_method = ClarabelDirectSolveMethods::QDLDL;
+        setIfPresent(s, "direct_kkt_solver", settings.direct_kkt_solver);
+        if (hasField(s, "direct_solve_method")) {
+            std::string solveMethod = toLower(getString(s[0]["direct_solve_method"],
+                                            "direct_solve_method"));
+            if (solveMethod == "auto") {
+                settings.direct_solve_method = ClarabelDirectSolveMethods::AUTO;
+            } else if (solveMethod == "qdldl") {
+                settings.direct_solve_method = ClarabelDirectSolveMethods::QDLDL;
 #ifdef FEATURE_FAER_SPARSE
-        } else if (solveMethod == "FAER") {
-            settings.direct_solve_method = ClarabelDirectSolveMethods::FAER;
+            } else if (solveMethod == "faer") {
+                settings.direct_solve_method = ClarabelDirectSolveMethods::FAER;
 #else
-        } else if (solveMethod == "FAER") {
-            raiseWarning("FAER requested, but this MEX was built without FAER support. Using QDLDL.");
-            settings.direct_solve_method = ClarabelDirectSolveMethods::QDLDL;
+            } else if (solveMethod == "faer") {
+                raiseWarning("FAER requested, but this MEX was built without FAER support. Using QDLDL.");
+                settings.direct_solve_method = ClarabelDirectSolveMethods::QDLDL;
 #endif
-        } else {
-            raiseError("Unknown direct_solve_method: " + solveMethod);
+            } else {
+                raiseError("Unknown direct_solve_method: " + solveMethod);
+            }
         }
 
         // Static/dynamic regularization
-        settings.static_regularization_enable      = readBool(s, "static_regularization_enable");
-        settings.static_regularization_constant     = readDouble(s, "static_regularization_constant");
-        settings.static_regularization_proportional = readDouble(s, "static_regularization_proportional");
-        settings.dynamic_regularization_enable     = readBool(s, "dynamic_regularization_enable");
-        settings.dynamic_regularization_eps        = readDouble(s, "dynamic_regularization_eps");
-        settings.dynamic_regularization_delta      = readDouble(s, "dynamic_regularization_delta");
+        setIfPresent(s, "static_regularization_enable", settings.static_regularization_enable);
+        setIfPresent(s, "static_regularization_constant", settings.static_regularization_constant);
+        setIfPresent(s, "static_regularization_proportional", settings.static_regularization_proportional);
+        setIfPresent(s, "dynamic_regularization_enable", settings.dynamic_regularization_enable);
+        setIfPresent(s, "dynamic_regularization_eps", settings.dynamic_regularization_eps);
+        setIfPresent(s, "dynamic_regularization_delta", settings.dynamic_regularization_delta);
 
         // Iterative refinement
-        settings.iterative_refinement_enable     = readBool(s, "iterative_refinement_enable");
-        settings.iterative_refinement_max_iter  = readUint(s, "iterative_refinement_max_iter");
-        settings.iterative_refinement_reltol    = readDouble(s, "iterative_refinement_reltol");
-        settings.iterative_refinement_abstol    = readDouble(s, "iterative_refinement_abstol");
-        settings.iterative_refinement_stop_ratio = readDouble(s, "iterative_refinement_stop_ratio");
+        setIfPresent(s, "iterative_refinement_enable", settings.iterative_refinement_enable);
+        setIfPresent(s, "iterative_refinement_max_iter", settings.iterative_refinement_max_iter);
+        setIfPresent(s, "iterative_refinement_reltol", settings.iterative_refinement_reltol);
+        setIfPresent(s, "iterative_refinement_abstol", settings.iterative_refinement_abstol);
+        setIfPresent(s, "iterative_refinement_stop_ratio", settings.iterative_refinement_stop_ratio);
 
 #ifdef FEATURE_SDP
         // Chordal decomposition (SDP problems only)
-        settings.chordal_decomposition_enable       = readBool(s, "chordal_decomposition_enable");
-        settings.chordal_decomposition_compact      = readBool(s, "chordal_decomposition_compact");
-        settings.chordal_decomposition_complete_dual = readBool(s, "chordal_decomposition_complete_dual");
+        setIfPresent(s, "chordal_decomposition_enable", settings.chordal_decomposition_enable);
+        setIfPresent(s, "chordal_decomposition_compact", settings.chordal_decomposition_compact);
+        setIfPresent(s, "chordal_decomposition_complete_dual", settings.chordal_decomposition_complete_dual);
 
-        std::string mergeMethod = getString(s[0]["chordal_decomposition_merge_method"],
-                                            "chordal_decomposition_merge_method");
-        if (mergeMethod == "CLIQUE_GRAPH") {
-            settings.chordal_decomposition_merge_method = ClarabelCliqueMergeMethods::CLIQUE_GRAPH;
-        } else if (mergeMethod == "PARENT_CHILD") {
-            settings.chordal_decomposition_merge_method = ClarabelCliqueMergeMethods::PARENT_CHILD;
-        } else if (mergeMethod == "NONE") {
-            settings.chordal_decomposition_merge_method = ClarabelCliqueMergeMethods::NONE;
-        } else {
-            raiseError("Unknown chordal_decomposition_merge_method: " + mergeMethod);
+        if (hasField(s, "chordal_decomposition_merge_method")) {
+            std::string mergeMethod = toLower(getString(s[0]["chordal_decomposition_merge_method"],
+                                            "chordal_decomposition_merge_method"));
+            if (mergeMethod == "clique_graph") {
+                settings.chordal_decomposition_merge_method = ClarabelCliqueMergeMethods::CLIQUE_GRAPH;
+            } else if (mergeMethod == "parent_child") {
+                settings.chordal_decomposition_merge_method = ClarabelCliqueMergeMethods::PARENT_CHILD;
+            } else if (mergeMethod == "none") {
+                settings.chordal_decomposition_merge_method = ClarabelCliqueMergeMethods::NONE;
+            } else {
+                raiseError("Unknown chordal_decomposition_merge_method: " + mergeMethod);
+            }
         }
 #endif
 
@@ -434,8 +480,8 @@ public:
     {
         matlabPtr_ = getEngine();
 
-        if (inputs.size() != 6) {
-            raiseError("clarabel_mex requires six inputs: P, q, A, b, cones, settings.");
+        if (inputs.size() != 5 && inputs.size() != 6) {
+            raiseError("clarabel_mex requires five or six inputs: P, q, A, b, cones [, settings].");
         }
         if (outputs.size() != 1) {
             raiseError("clarabel_mex returns a single solution struct.");
@@ -447,7 +493,9 @@ public:
         Eigen::VectorXd b = toVector(inputs[3], "b");
 
         ConeSpec coneSpec = parseCones(inputs[4]);
-        DefaultSettings<double> settings = parseSettings(inputs[5]);
+        DefaultSettings<double> settings = inputs.size() == 6
+            ? parseSettings(inputs[5])
+            : mexDefaultSettings();
 
         DefaultSolver<double> solver(P, q, A, b, coneSpec.cones, settings);
         solver.print_to_buffer();
