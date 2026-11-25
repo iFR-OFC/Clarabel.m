@@ -29,15 +29,5 @@ settings.max_iter = 100;
 settings.verbose = 1;
 settings.direct_solve_method =  'FAER';
 
-solution = clarabel_mex(P,q,A,b,cones)
-
 solution = clarabel_mex(P,q,A,b,cones,settings);
 
-settings = [];
-settings.max_iter = 10;
-settings.verbose = 1;
-solution = clarabel_mex(P,q,A,b,cones,settings);
-
-settings = struct();
-solution = clarabel_mex(P,q,A,b,cones,[]);
-solution = clarabel_mex(P,q,A,b,cones,settings);
