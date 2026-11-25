@@ -45,7 +45,7 @@ The following options are set in the .mex files:
 # Build Binaries
 The following instructions are for Windows, Mac (Silicon) and Linux. 
 
-## Windows 
+## Windows (MKL)
 On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .mex interface uses activated SDP feature of Clarabel and assume we also use the more efficient [faer-rs](https://github.com/sarah-quinones/faer-rs) library.
 
 1. Install or update [Rust](https://www.rust-lang.org/tools/install) (if necessary)
@@ -74,7 +74,7 @@ On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .
       which provides you the path to vcpkg.cmake. In Windows PowerShell this should provide you something like  
       ``` CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"```
       which is needed below, i.e., ``` PathToVcpk/vcpkg.cmake``` under step 6.
-
+      
 3. Make sure you have a C/C++ compiler (on Windows either Visual Studio (MSVC) or MinGW-w64 GCC, see step 10; on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
    > **Note:** On Windows we used Visual Studio 18 2026 with Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
    For GNU we used GNU 8.1.0 for both C/C++.
@@ -112,6 +112,112 @@ On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .
    >**Note:** On Windows it might show some uncritical warnings during the compilation. 
    10. Ensure  ```mex -setup``` uses the same C/C++ compiler as used for compiling the C/C++ wrapper. 
    11.  Open Matlab and run
+   ```
+   make_clarabel_mex.m
+   ```
+   > **Note**: 
+   > To successfully run `make_clarabel_mex.m`, you need to set the path to the Eigen library in the `EIGEN_PATH` environment variable if it is not found automatically  The MEX can be built with or without the SDP and faer features by calling `make_clarabel_mex(useFeatureSDP)`. Make sure the feature selection matches the features the Clarabel Rust library was compiled with.
+
+
+   This command compiles the mex file `clarabel_mex`. 
+
+## Windows (OpenBlas)
+For AMD processor we provide an alternative way using Clarabel's interface to OpenBlas. Unfortunately, the available OpenBlas build in `vcpk` has some missing files. This means we need a little more manual effort as described below using `pkgconfig`. 
+On Windows we used an MS Visual Studio (MSVC) or a MinGW-w64 GNU compiler. The .mex interface uses activated SDP feature of Clarabel and assume we also use the more efficient [faer-rs](https://github.com/sarah-quinones/faer-rs) library.
+
+1. Install or update [Rust](https://www.rust-lang.org/tools/install) (if necessary)
+2. Install [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)). We **recommend**  to use  [vcpkg](https://vcpkg.io/en/) to install the packages. An alterntive is to manually get [eigen](https://eigen.tuxfamily.org/index.php?title=Main\_Page](https://eigen.tuxfamily.org/index.php?title=Main_Page)) and add it to your ENVIRONMENT VARIABLES (or later pass the eigen folder in make_clarabel.m)
+
+   **Install vcpkg**
+
+      Decide a folder on your computer where to clone and use
+      ```
+      git clone https://github.com/microsoft/vcpkg.git
+      cd vcpkg
+      .\bootstrap-vcpkg.bat
+      ```
+      Get eigen with for GNU 
+      ```
+      .\vcpkg.exe install eigen3:x64-mingw-dynamic
+      ```
+      or, with MSVC (Visual Studio):  
+      ```
+      .\vcpkg.exe install eigen3:x64-windows
+      ```
+      and pkgconfig
+      ```
+      .\vcpkg.exe install pkgconf:x64-windows
+      ```
+      For the usage with CMake use 
+      ```
+      .\vcpkg integrate install
+      ``` 
+      which provides you the path to vcpkg.cmake. In Windows PowerShell this should provide you something like  
+      ``` CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"```
+      which is needed below, i.e., ``` PathToVcpk/vcpkg.cmake``` under step 6.
+3. Download OpenBlas from https://github.com/OpenMathLib/OpenBLAS/releases/latest download **`OpenBLAS-0.3.34-x64.zip`**. Unzip it and store it at a desired folder, e.g.
+   ```
+   C:\OpenBLAS          # The OpenBlas folder should look like this: bin\libopenblas.dll, lib\libopenblas.lib, include\, lib\pkgconfig\
+   ```
+   Check the  `C:\OpenBLAS\lib\pkgconfig\openblas.pc` file if `DYNAMIC_ARCH=1 DYNAMIC_OLDER=1` is set. If so, for AMD chips it should automatically select the Zen kernel.
+4. Create a `.pc` to register it for `pkg-config`. Copy the `C:\OpenBLAS\lib\pkgconfig\openblas.pc` and put it in a desired folder, e.g.,  `C:\tools\pkgconfig\openblas.pc`. Replace with the following:
+   ```
+    libdir="C:/OpenBLAS/lib"
+    includedir="C:/OpenBLAS/include"
+    
+    Name: openblas
+    Description: OpenBLAS (official Windows build, DYNAMIC_ARCH)
+    Version: 0.3.34
+    Libs: -L${libdir} -llibopenblas
+    Cflags: -I${includedir}
+   ```
+6. Set environment variables (Here, we assume `vcpkg` is installed/stored at `C:\vcpkg`; you have to replace it with your path) 
+   ```powershell
+   setx PKG_CONFIG "C:\vcpkg\installed\x64-windows\tools\pkgconf\pkgconf.exe"
+   setx PKG_CONFIG_PATH "C:\tools\pkgconfig"
+   setx EIGEN_PATH "C:\vcpkg\installed\x64-windows\include\eigen3"
+   ```
+7. Set to Path (replace `C:\OpenBLAS` with your location)
+   ```powershell
+   setx PATH "$env:PATH;C:\OpenBLAS\bin"     # appends to the current user PATH
+   ```
+3. Make sure you have a C/C++ compiler (on Windows either Visual Studio (MSVC) or MinGW-w64 GCC, see step 10; on Linux GCC or Clang; needed to compile the Rust-Wrapper and the actual .mex function).
+   > **Note:** On Windows we used Visual Studio 18 2026 with Windows SDK version 10.0.26100.0 to target Windows 10.0.26200. The C compiler identification is MSVC 19.50.35723.0  The CXX compiler identification is MSVC 19.50.35723.0.
+   For GNU we used GNU 8.1.0 for both C/C++.
+4. Clone this repository and also two submodules, i.e., Clarabel.cpp which contains the Clarabel.rs as submodule
+   ```
+   git clone --recurse-submodules https://github.com/iFR-OFC/Clarabel.m.git
+   ```
+6. Switch to the Clarabel Folder (assuming we are in Clarabel.m, i.e., the main folder)
+   ```
+   cd Clarabel
+   ```
+7. In the **Clarabel** folder, open **Windows PowerShell**.
+8.  Use the following commands to compile in release mode with faer-rs (efficient linear algebra in Rust) and vcpkg (on Windows) (change **PathToVcpk** to your installation directory from Step 2)
+
+      On Windows, two compiler options. We recommend the MSVC option (see warning below GNU).
+      > **Note:** run `mex -setup C/C++` in MATLAB and select the same compiler (MinGW-w64 GCC or MSVC), so the MEX file and the Clarabel library are built with the same compiler. 
+   
+   **MSVC (Visual Studio):**
+   ```powershell
+   mkdir build
+   cd build
+   cmake .. -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true -DCLARABEL_FEATURE_SDP=sdp-openblas
+   cmake --build . --config Release
+   ```
+   >**Note:** On Windows it might show some uncritical warnings during the compilation. 
+   
+   **GNU compiler (MinGW-w64;** make sure `gcc`, `g++` and `mingw32-make` are on your PATH**):**
+   ```powershell
+   mkdir build
+   cd build
+   cmake .. -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_TOOLCHAIN_FILE=PathToVcpk/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic -DCMAKE_BUILD_TYPE=Release -DCLARABEL_FEATURE_FAER_SPARSE=true -DCLARABEL_FEATURE_SDP=sdp-openblas
+   cmake --build .
+   ```
+   >**Warning:** If compiled with MinGW, the verbosity option does not work, i.e., the Clarabel iterations are not printed to the Command Window. 
+   >**Note:** On Windows it might show some uncritical warnings during the compilation.
+9. Ensure  ```mex -setup``` uses the same C/C++ compiler as used for compiling the C/C++ wrapper.
+10.  Open Matlab and run
    ```
    make_clarabel_mex.m
    ```
