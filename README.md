@@ -305,14 +305,14 @@ On Mac, we make use of ```homebrew```.
 
 Our implementation is similar to the usage in other languages, e.g., python, see below. 
 We provide the MATLAB implementations of the Examples, found on the Clarabel [homepage](https://clarabel.org/stable/) under Examples.
-You can find the Clarabel options [here](https://clarabel.org/stable/api_settings/) and set in ```DefaultSettings.m```
+You can find the Clarabel options [here](https://clarabel.org/stable/api_settings/) and set in ```DefaultSettings.m```. The order of the cones can be arbitrary similar to the Python interface.
 
 > **Note**: 
 > Not all features are in the pre-compiled binaries or are activated in the above described build processes.
 
 ## Usage Example
 
-Below is an usage example to showcase solving an optimization problem.
+Below is an usage example to showcase solving an optimization problem. 
 The following example simply implements the [getting started example for Python](https://clarabel.org/stable/python/getting_started_py/) via the MATLAB/mex interface. More Examples can be found in the examples folder.
 
 ```matlab
@@ -357,4 +357,29 @@ sol = clarabel_mex(P,q,A,b,cones,settings)
 
 ```
 
-The order of the cones can be arbitrary similar to the Python interface.
+For the settings, you have several option, which are also shown in `ex_settings.m`. 
+```matlab
+% no options passed; we use the default set by clarabel C/C++ interface
+sol = clarabel_mex(P,q,A,b,cones)
+
+% no options passed/empty array; we use the default set by clarabel C/C++ interface
+sol = clarabel_mex(P,q,A,b,cones,[])
+
+
+% no options passed/empty struct; we use the default set by clarabel C/C++ interface
+settings = struct();
+sol = clarabel_mex(P,q,A,b,cones,settings)
+
+% Overwrite all settings by DefaulSettings.m
+settings = DefaultSettings();
+sol = clarabel_mex(P,q,A,b,cones,settings)
+
+% just overwrite selected settings; rest uses default
+settings = struct();
+settings.verbose = 1;
+settings.time_limit = 5.;
+sol = clarabel_mex(P,q,A,b,cones,settings)
+
+```
+
+
