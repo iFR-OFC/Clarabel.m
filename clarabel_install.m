@@ -47,6 +47,8 @@ if isIntel
     proc_prefix = 'Intel';
 elseif isAMD
     proc_prefix = 'AMD';
+else
+    proc_prefix = '';
 end
 
 % generate a mex_files folder
@@ -56,16 +58,30 @@ if ~isfolder(mexDir)
 end
 
 % generate a folder depending on OS
-platformDir = fullfile(mexDir, platform);
+% (Windows distinguishes AMD/Intel, Mac and Linux do not)
+if ispc
+    if isempty(proc_prefix)
+        error('clarabel_install:cpuNotDetected', ...
+            'Could not detect an Intel or AMD CPU on Windows (detected: "%s").', strtrim(cpuInfo));
+    end
+    platformDir = fullfile(mexDir, [platform '_' proc_prefix]);
+    zipFile = sprintf('%s_%s.zip', platform, proc_prefix);
+    downloadUrl = sprintf('https://github.com/iFR-OFC/Clarabel.m/releases/latest/download/%s_%s.zip', platform, proc_prefix);
+else
+    platformDir = fullfile(mexDir, platform);
+    zipFile = sprintf('%s.zip', platform);
+    downloadUrl = sprintf('https://github.com/iFR-OFC/Clarabel.m/releases/latest/download/%s.zip', platform);
+end
+
 if ~isfolder(platformDir)
     mkdir(platformDir)
 end
 
 % download binaries from release page depending on OS
 fprintf('Downloading binaries...');
-zipFile = sprintf('%s_%s.zip', platform,proc_prefix);
 zipPath = fullfile(platformDir, zipFile);
-websave(zipPath, sprintf('https://github.com/iFR-OFC/Clarabel.m/releases/latest/download/%s.zip', platform));
+websave(zipPath, downloadUrl);
+
 
 % delete zip
 unzip(zipPath, mexDir)
