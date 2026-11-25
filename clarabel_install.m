@@ -20,12 +20,33 @@ projectRoot = fileparts(mfilename('fullpath'));
 if ispc
     disp('Windows detected')
     platform = 'windows';
+     
+    % check what processor
+     [~, cpuInfo] = system('powershell -Command "(Get-CimInstance Win32_Processor).Manufacturer"');
+
 elseif ismac
     disp('MacOS detected')
     platform = 'mac_silicon';
+    % check what processor
+     [~, cpuInfo] = system('sysctl -n machdep.cpu.brand_string');
 else
     disp('Linux detected')
     platform = 'linux';
+    % check what processor
+    [~, cpuInfo] = system('grep -m1 "vendor_id" /proc/cpuinfo');
+end
+
+% check what processor and download corresponding pre-compiled binary
+% (currently only Windows!!!)
+% Rational: For Mac we assume accelerate is used, which is the most
+% efficient for Mac; Linux is a To Do!)
+isIntel = contains(cpuInfo, 'Intel', 'IgnoreCase', true);
+isAMD   = contains(cpuInfo, 'AMD', 'IgnoreCase', true);
+
+if isIntel
+    proc_prefix = 'Intel';
+elseif isAMD
+    proc_prefix = 'AMD';
 end
 
 % generate a mex_files folder
@@ -42,7 +63,7 @@ end
 
 % download binaries from release page depending on OS
 fprintf('Downloading binaries...');
-zipFile = sprintf('%s.zip', platform);
+zipFile = sprintf('%s_%s.zip', platform,proc_prefix);
 zipPath = fullfile(platformDir, zipFile);
 websave(zipPath, sprintf('https://github.com/iFR-OFC/Clarabel.m/releases/latest/download/%s.zip', platform));
 
